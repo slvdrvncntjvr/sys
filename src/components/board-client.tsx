@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { Archive, Pin, PinOff, Save, Search, Trash2, Undo2 } from "lucide-react";
-import type { BoardView, NoteDto } from "@/types/note";
+import type { BoardView, NoteDto, NoteMetadata } from "@/types/note";
 
 type BoardClientProps = {
   initialNotes: NoteDto[];
@@ -16,7 +17,14 @@ type EditDraft = {
   title: string;
   content: string;
   tagsRaw: string;
+  imageDataUrl: string | null;
 };
+
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+
+function getImageDataUrl(metadata: NoteMetadata | null): string | null {
+  return metadata?.imageDataUrl ?? null;
+}
 
 function normalizeTags(raw: string): string[] {
   return raw
@@ -41,6 +49,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
   const [quickTitle, setQuickTitle] = useState("");
   const [quickCapture, setQuickCapture] = useState("");
   const [quickTags, setQuickTags] = useState("");
+  const [quickImageDataUrl, setQuickImageDataUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -49,6 +58,40 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const quickCaptureRef = useRef<HTMLTextAreaElement>(null);
+
+  async function fileToDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("Failed to read image."));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handleQuickImageSelect(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError("Image too large. Maximum size is 2 MB.");
+      return;
+    }
+
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setQuickImageDataUrl(dataUrl);
+      setError(null);
+    } catch {
+      setError("Could not read image.");
+    }
+  }
 
   const viewTitle = useMemo(() => {
     if (view === "archive") return "Archive";
@@ -131,6 +174,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
         title: quickTitle,
         content: quickCapture,
         tags: normalizeTags(quickTags),
+        imageDataUrl: quickImageDataUrl,
       }),
     });
 
@@ -144,6 +188,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
     setQuickTitle("");
     setQuickCapture("");
     setQuickTags("");
+    setQuickImageDataUrl(null);
     await refreshNotes("");
   }
 
@@ -186,6 +231,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
       title: note.title,
       content: note.content,
       tagsRaw: note.tags.join(", "),
+      imageDataUrl: getImageDataUrl(note.metadata),
     });
   }
 
@@ -196,6 +242,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
       title: draft.title,
       content: draft.content,
       tags: normalizeTags(draft.tagsRaw),
+      imageDataUrl: draft.imageDataUrl,
     });
 
     if (ok) {
@@ -293,6 +340,40 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
           className="mt-3 min-h-28 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
         />
 
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <label className="inline-flex cursor-pointer items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Add image
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={(event) => void handleQuickImageSelect(event)}
+              className="hidden"
+            />
+          </label>
+          {quickImageDataUrl ? (
+            <button
+              onClick={() => setQuickImageDataUrl(null)}
+              className="rounded-lg border border-rose-300 px-3 py-2 text-sm font-medium text-rose-700"
+            >
+              Remove image
+            </button>
+          ) : null}
+        </div>
+
+        {quickImageDataUrl ? (
+          <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
+            <Image
+              src={quickImageDataUrl}
+              alt="Selected upload preview"
+              width={1200}
+              height={900}
+              className="h-auto w-full object-cover"
+              unoptimized
+            />
+          </div>
+        ) : null}
+
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs text-slate-500">Hotkeys: / search, n quick capture, Ctrl/Cmd+Enter save.</p>
           <button
@@ -364,6 +445,58 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
                     onChange={(event) => setDraft({ ...draft, content: event.target.value })}
                     className="min-h-28 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-500"
                   />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="inline-flex cursor-pointer items-center rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
+                      Update image
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={async (event) => {
+                          const file = event.target.files?.[0];
+                          if (!file) {
+                            return;
+                          }
+                          if (!file.type.startsWith("image/")) {
+                            setError("Please choose an image file.");
+                            return;
+                          }
+                          if (file.size > MAX_IMAGE_BYTES) {
+                            setError("Image too large. Maximum size is 2 MB.");
+                            return;
+                          }
+                          try {
+                            const dataUrl = await fileToDataUrl(file);
+                            setDraft({ ...draft, imageDataUrl: dataUrl });
+                            setError(null);
+                          } catch {
+                            setError("Could not read image.");
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                    {draft.imageDataUrl ? (
+                      <button
+                        onClick={() => setDraft({ ...draft, imageDataUrl: null })}
+                        className="rounded-lg border border-rose-300 px-3 py-1.5 text-xs font-medium text-rose-700"
+                      >
+                        Remove image
+                      </button>
+                    ) : null}
+                  </div>
+                  {draft.imageDataUrl ? (
+                    <div className="overflow-hidden rounded-lg border border-slate-200">
+                      <Image
+                        src={draft.imageDataUrl}
+                        alt="Draft image preview"
+                        width={1200}
+                        height={900}
+                        className="h-auto w-full object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  ) : null}
                   <input
                     value={draft.tagsRaw}
                     onChange={(event) => setDraft({ ...draft, tagsRaw: event.target.value })}
@@ -397,6 +530,19 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
                     </span>
                   </div>
                   <p className="mb-3 line-clamp-6 whitespace-pre-wrap text-sm text-slate-700">{note.content}</p>
+
+                  {getImageDataUrl(note.metadata) ? (
+                    <div className="mb-3 overflow-hidden rounded-lg border border-slate-200">
+                      <Image
+                        src={getImageDataUrl(note.metadata)!}
+                        alt={note.title}
+                        width={1200}
+                        height={900}
+                        className="h-auto w-full object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  ) : null}
 
                   {note.metadata?.url ? (
                     <a

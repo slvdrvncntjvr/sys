@@ -1,4 +1,5 @@
 import sanitizeHtml from "sanitize-html";
+import type { NoteMetadata } from "@/types/note";
 
 const MAX_TAGS = 10;
 const MAX_TITLE_LENGTH = 120;
@@ -48,4 +49,45 @@ export function extractUrlMetadata(content: string): Record<string, string> | nu
   } catch {
     return null;
   }
+}
+
+export function sanitizeImageDataUrl(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.trim();
+  const isAllowedDataUrl = /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-zA-Z0-9+/=\r\n]+$/i.test(
+    normalized,
+  );
+
+  if (!isAllowedDataUrl) {
+    return null;
+  }
+
+  return normalized;
+}
+
+export function mergeNoteMetadata({
+  content,
+  imageDataUrl,
+  previous,
+}: {
+  content: string;
+  imageDataUrl?: string | null;
+  previous?: NoteMetadata | null;
+}): NoteMetadata | null {
+  const urlMeta = extractUrlMetadata(content) ?? {};
+  const safeImage = sanitizeImageDataUrl(imageDataUrl);
+  const merged: NoteMetadata = {
+    ...urlMeta,
+  };
+
+  if (safeImage) {
+    merged.imageDataUrl = safeImage;
+  } else if (previous?.imageDataUrl) {
+    merged.imageDataUrl = previous.imageDataUrl;
+  }
+
+  return Object.keys(merged).length > 0 ? merged : null;
 }

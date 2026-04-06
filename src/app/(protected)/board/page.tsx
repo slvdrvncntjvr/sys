@@ -1,12 +1,12 @@
 import { BoardClient } from "@/components/board-client";
 import { getOwnerSession } from "@/lib/auth";
 import { getNotesForView } from "@/lib/note-queries";
-import type { NoteDto } from "@/types/note";
+import type { NoteDto, NoteMetadata } from "@/types/note";
 
 function serializeNotes(notes: Awaited<ReturnType<typeof getNotesForView>>): NoteDto[] {
   return notes.map((note) => ({
     ...note,
-    metadata: (note.metadata as Record<string, string> | null) ?? null,
+    metadata: (note.metadata as NoteMetadata | null) ?? null,
     createdAt: note.createdAt.toISOString(),
     updatedAt: note.updatedAt.toISOString(),
   }));

@@ -5,7 +5,7 @@ import { getNotesForView } from "@/lib/note-queries";
 import { prisma } from "@/lib/prisma";
 import {
   buildTitleFromContent,
-  extractUrlMetadata,
+  mergeNoteMetadata,
   sanitizeContent,
   sanitizeTags,
   sanitizeTitle,
@@ -57,7 +57,10 @@ export async function POST(request: Request) {
 
   const title = sanitizeTitle(parsed.data.title) || buildTitleFromContent(content);
   const tags = sanitizeTags(parsed.data.tags ?? []);
-  const metadata = extractUrlMetadata(content);
+  const metadata = mergeNoteMetadata({
+    content,
+    imageDataUrl: parsed.data.imageDataUrl,
+  });
 
   const note = await prisma.note.create({
     data: {

@@ -1,3 +1,9 @@
+export type NoteMetadata = {
+  url?: string;
+  host?: string;
+  imageDataUrl?: string;
+};
+
 export type NoteDto = {
   id: string;
   title: string;
@@ -6,7 +12,7 @@ export type NoteDto = {
   isPinned: boolean;
   isArchived: boolean;
   isTrashed: boolean;
-  metadata: Record<string, string> | null;
+  metadata: NoteMetadata | null;
   createdAt: string;
   updatedAt: string;
 };

@@ -5,11 +5,12 @@ import { getOwnerSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   buildTitleFromContent,
-  extractUrlMetadata,
+  mergeNoteMetadata,
   sanitizeContent,
   sanitizeTags,
   sanitizeTitle,
 } from "@/lib/sanitize";
+import type { NoteMetadata } from "@/types/note";
 import { updateNoteSchema } from "@/lib/validators/note";
 
 const paramsSchema = z.object({ id: z.string().cuid() });
@@ -69,7 +70,12 @@ export async function PATCH(
       isPinned: data.isPinned ?? existing.isPinned,
       isArchived: data.isArchived ?? existing.isArchived,
       isTrashed: data.isTrashed ?? existing.isTrashed,
-      metadata: extractUrlMetadata(nextContent) ?? Prisma.JsonNull,
+      metadata:
+        mergeNoteMetadata({
+          content: nextContent,
+          imageDataUrl: data.imageDataUrl,
+          previous: (existing.metadata as NoteMetadata | null) ?? null,
+        }) ?? Prisma.JsonNull,
     },
   });
 
