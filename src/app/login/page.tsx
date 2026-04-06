@@ -16,13 +16,13 @@ export default async function LoginPage() {
 
   return (
     <main className="relative mx-auto flex min-h-screen w-full max-w-md items-center px-6">
-      <div className="w-full rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-xl backdrop-blur sm:p-8">
+      <div className="lux-panel w-full rounded-3xl p-6 sm:p-8">
         <div className="mb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
             private workspace
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">System Board</h1>
-          <p className="mt-2 text-sm text-slate-600">Owner-only sign in required.</p>
+          <p className="mt-2 text-sm text-slate-600">Owner-only sign in to manage your public braindump.</p>
         </div>
         <LoginForm />
       </div>

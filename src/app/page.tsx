@@ -2,6 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { PublicBoard } from "@/components/public-board";
 import type { NoteDto, NoteMetadata } from "@/types/note";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function serializeNotes(
   notes: Array<{
     id: string;

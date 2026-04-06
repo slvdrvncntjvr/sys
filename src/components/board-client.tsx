@@ -255,15 +255,16 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <header className="mb-5 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm backdrop-blur">
+      <header className="lux-panel mb-6 rounded-3xl p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">System Board</h1>
-            <p className="text-sm text-slate-600">Private owner workspace</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">Owner console</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">System Board</h1>
+            <p className="mt-2 text-sm text-slate-600">Capture, shape, and publish your stream instantly.</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+            className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
           >
             Sign out
           </button>
@@ -274,8 +275,8 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             href="/board"
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
               pathname === "/board"
-                ? "bg-teal-600 text-white"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                ? "bg-blue-600 text-white"
+                : "lux-chip hover:bg-white"
             }`}
           >
             Board
@@ -284,8 +285,8 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             href="/archive"
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
               pathname === "/archive"
-                ? "bg-teal-600 text-white"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                ? "bg-blue-600 text-white"
+                : "lux-chip hover:bg-white"
             }`}
           >
             Archive
@@ -294,8 +295,8 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             href="/trash"
             className={`rounded-full px-3 py-1.5 text-sm font-medium transition ${
               pathname === "/trash"
-                ? "bg-teal-600 text-white"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                ? "bg-blue-600 text-white"
+                : "lux-chip hover:bg-white"
             }`}
           >
             Trash
@@ -303,7 +304,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
         </nav>
       </header>
 
-      <section className="mb-5 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+      <section className="lux-panel mb-5 rounded-2xl p-4">
         <div className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900">
           <Save size={18} /> Quick capture
         </div>
@@ -314,7 +315,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             value={quickTitle}
             onChange={(event) => setQuickTitle(event.target.value)}
             placeholder="Optional title"
-            className="h-11 rounded-xl border border-slate-300 px-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+            className="lux-input h-11 rounded-xl px-3 outline-none transition"
           />
 
           <input
@@ -322,7 +323,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             value={quickTags}
             onChange={(event) => setQuickTags(event.target.value)}
             placeholder="tags: personal, links"
-            className="h-11 rounded-xl border border-slate-300 px-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200 sm:col-span-2"
+            className="lux-input h-11 rounded-xl px-3 outline-none transition sm:col-span-2"
           />
         </div>
 
@@ -337,11 +338,11 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             }
           }}
           placeholder="Paste text or links here. Press Ctrl/Cmd + Enter to save quickly."
-          className="mt-3 min-h-28 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          className="lux-input mt-3 min-h-28 w-full rounded-xl px-3 py-2 outline-none transition"
         />
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <label className="inline-flex cursor-pointer items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <label className="lux-chip inline-flex cursor-pointer items-center rounded-lg px-3 py-2 text-sm font-medium hover:bg-white">
             Add image
             <input
               type="file"
@@ -354,7 +355,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
           {quickImageDataUrl ? (
             <button
               onClick={() => setQuickImageDataUrl(null)}
-              className="rounded-lg border border-rose-300 px-3 py-2 text-sm font-medium text-rose-700"
+              className="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700"
             >
               Remove image
             </button>
@@ -379,14 +380,14 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
           <button
             onClick={() => void createNote()}
             disabled={submitting || !quickCapture.trim()}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? "Saving..." : "Save note"}
           </button>
         </div>
       </section>
 
-      <section className="mb-5 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+      <section className="lux-panel mb-5 rounded-2xl p-4">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
@@ -395,7 +396,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder={`Search in ${viewTitle.toLowerCase()} by text or tag`}
-            className="h-11 w-full rounded-xl border border-slate-300 pl-9 pr-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+            className="lux-input h-11 w-full rounded-xl pl-9 pr-3 outline-none transition"
           />
         </div>
       </section>
@@ -415,7 +416,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
       ) : null}
 
       {isEmpty ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+        <div className="lux-panel rounded-2xl border-dashed p-10 text-center">
           <h2 className="text-lg font-semibold text-slate-900">No notes in {viewTitle.toLowerCase()}.</h2>
           <p className="mt-1 text-sm text-slate-600">
             {view === "board"
@@ -432,7 +433,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
           const editing = editingId === note.id;
 
           return (
-            <article key={note.id} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+            <article key={note.id} className="lux-panel rounded-2xl p-4">
               {editing && draft ? (
                 <div className="space-y-2">
                   <input
@@ -525,7 +526,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
                 <>
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <h3 className="line-clamp-2 text-base font-semibold text-slate-900">{note.title}</h3>
-                    <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-600">
+                    <span className="lux-chip rounded-full px-2 py-1 text-xs">
                       {formatTime(note.updatedAt)}
                     </span>
                   </div>
@@ -549,7 +550,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
                       href={note.metadata.url}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="mb-3 block rounded-lg border border-teal-200 bg-teal-50 px-2 py-1.5 text-xs text-teal-700"
+                      className="mb-3 block rounded-lg border border-blue-200 bg-blue-50 px-2 py-1.5 text-xs text-blue-700"
                     >
                       {note.metadata.host}
                     </a>
@@ -560,7 +561,7 @@ export function BoardClient({ initialNotes, view }: BoardClientProps) {
                       {note.tags.map((tag) => (
                         <span
                           key={`${note.id}-${tag}`}
-                          className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700"
+                          className="lux-chip rounded-full px-2 py-1 text-xs font-medium"
                         >
                           #{tag}
                         </span>

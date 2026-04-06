@@ -48,7 +48,7 @@ export function LoginForm() {
           autoComplete="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="h-11 rounded-xl border border-slate-300 bg-white px-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          className="lux-input h-11 rounded-xl px-3 outline-none transition"
           placeholder="owner@domain.com"
         />
       </label>
@@ -61,7 +61,7 @@ export function LoginForm() {
           autoComplete="current-password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          className="h-11 rounded-xl border border-slate-300 bg-white px-3 text-slate-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+          className="lux-input h-11 rounded-xl px-3 outline-none transition"
           placeholder="Your password"
         />
       </label>
@@ -75,7 +75,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-blue-600 px-4 font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Signing in..." : "Sign in"}
       </button>
